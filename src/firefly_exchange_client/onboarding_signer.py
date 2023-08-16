@@ -1,12 +1,13 @@
 from web3 import Web3
 from .interfaces import *
 from .signer import Signer
+import hashlib
 
 class OnboardingSigner(Signer):
     def __init__(self):
         super().__init__()
 
-    def create_signature(self, msg, private_key):
+    def create_signature(self, msg, private_key, encoding="utf-8"):
         """
             Signs the message.
             Inputs:
@@ -15,6 +16,6 @@ class OnboardingSigner(Signer):
             Returns:
                 - str: signed msg hash
         """
-        hash = Web3.sha3(text=msg).hex()
-        return self.sign_hash(hash, private_key)
+        hash=hashlib.sha256(msg.encode(encoding=encoding))
+        return self.sign_hash(hash.digest(), private_key)
 

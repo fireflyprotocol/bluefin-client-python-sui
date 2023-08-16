@@ -1,6 +1,7 @@
 from web3 import Web3
 import eth_account
-
+import nacl
+import hashlib
 class Signer:
     def __init__(self):
         pass
@@ -31,8 +32,5 @@ class Signer:
         """
             Signs the hash and returns the signature. 
         """
-        result = eth_account.account.Account.sign_message(
-            eth_account.messages.encode_defunct(hexstr=hash),
-            private_key
-        )
-        return result['signature'].hex() + append
+        result= nacl.signing.SigningKey(private_key).sign(hash)[:64]
+        return result.hex()+'1' + append

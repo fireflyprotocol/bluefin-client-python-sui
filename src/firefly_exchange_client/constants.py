@@ -2,10 +2,11 @@ Networks = {
   "SUI_STAGING":{
       "url":"",
       "chainId":1234,
-      "apiGateway":"https://dapi.api.sui-staging.bluefin.io/",
-      "socketURL":"wss://dapi.api.sui-staging.bluefin.io/",
-      "dmsURL":"https://dapi.api.sui-staging.bluefin.io/",
-      "webSocketURL":"wss://notifications.api.sui-staging.bluefin.io"
+      "apiGateway":"https://dapi.api.sui-staging.bluefin.io",
+      "socketURL":"wss://dapi.api.sui-staging.bluefin.io",
+      "dmsURL":"https://dapi.api.sui-staging.bluefin.io",
+      "webSocketURL":"wss://notifications.api.sui-staging.bluefin.io",
+      "onboardingUrl": "https://testnet.bluefin.exchange",
 
   },
 
@@ -90,7 +91,7 @@ SERVICE_URLS = {
     "META": "/meta",
     "STATUS": "/status",
     "SYMBOLS": "/marketData/symbols",
-    "CONTRACT_ADDRESSES": "https://testnet.firefly.exchange",
+    "CONTRACT_ADDRESSES": "/marketData/contractAddresses",
     "TICKER": "/ticker",
     "MASTER_INFO": "/masterInfo",
     "FUNDING_RATE":"/fundingRate"

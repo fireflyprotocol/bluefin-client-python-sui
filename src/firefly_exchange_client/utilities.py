@@ -2,6 +2,34 @@ from datetime import datetime
 from random import randint
 from web3 import Web3
 import time
+import bip_utils
+import hashlib
+
+
+def mnemonicToPrivateKey(seedPhrase: str)-> str:
+    bip39_seed = bip_utils.Bip39SeedGenerator(seedPhrase).Generate()
+    bip32_ctx = bip_utils.Bip32Slip10Ed25519.FromSeed(bip39_seed)
+    derivation_path="m/44'/784'/0'/0'/0'"
+    bip32_der_ctx = bip32_ctx.DerivePath(derivation_path)
+    private_key: str = bip32_der_ctx.PrivateKey().Raw()
+    return private_key
+
+def privateKeyToPublicKey(privateKey: str)-> str:
+    privateKeyBytes=bytes(privateKey)
+    bip32_ctx = bip_utils.Bip32Slip10Ed25519.FromPrivateKey(privateKeyBytes)
+    public_key: str = bip32_ctx.PublicKey().RawCompressed()  
+    return public_key
+
+def getAddressFromPublicKey(publicKey: str)-> str:
+    address: str = "0x" + hashlib.blake2b(publicKey.ToBytes(), digest_size=32).digest().hex()[:]
+    return address
+
+
+
+
+
+
+
 
 def strip_hex_prefix(input):
     if input[0:2] == '0x':

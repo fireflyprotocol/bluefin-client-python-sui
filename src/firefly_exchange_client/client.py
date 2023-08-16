@@ -9,6 +9,7 @@ from .interfaces import *
 from .sockets import Sockets
 from .enumerations import *
 from .websocket_client import WebsocketClient
+from .account import *
 
 from eth_account import Account
 from eth_utils import to_wei, from_wei
@@ -19,7 +20,9 @@ class FireflyClient:
         self.network = network
         self.w3 = self._connect_w3(self.network["url"])
         if private_key != "":
-            self.account = Account.from_key(private_key)
+            #currently we only support seed phrase 
+            self.account=SuiWallet(seed=private_key)
+            #self.account = Account.from_key(private_key)
         self.apis = APIService(self.network["apiGateway"], default_value(self.network, "UUID", "") )
         self.dmsApi = APIService(self.network["dmsURL"])
         self.socket = Sockets(self.network["socketURL"])
@@ -38,17 +41,17 @@ class FireflyClient:
         """
         self.contracts.contract_addresses = await self.get_contract_addresses()
 
-        if "error" in self.contracts.contract_addresses:
-            raise Exception("Error initializing client: {}".format(self.contracts.contract_addresses["error"]))
+#        if "error" in self.contracts.contract_addresses:
+#            raise Exception("Error initializing client: {}".format(self.contracts.contract_addresses["error"]))
 
         # adding auxiliaryContracts to contracts class
-        for i,j in self.contracts.get_contract_address(market="auxiliaryContractsAddresses").items():
-            self.add_contract(name=i,address=j)
+ #       for i,j in self.contracts.get_contract_address(market="ETH-PERP").items():
+ #           self.add_contract(name=i,address=j)
         
         # contracts pertaining to markets
-        for k, v in self.contracts.contract_addresses.items():
-            if 'PERP' in k:
-                self.add_contract(name="Perpetual",address=v["Perpetual"], market=k)
+ #       for k, v in self.contracts.contract_addresses.items():
+ #           if 'PERP' in k:
+ #               self.add_contract(name="Perpetual",address=v["Perpetual"], market=k)
 
         if api_token:
             self.apis.api_token = api_token
@@ -76,8 +79,9 @@ class FireflyClient:
         # if no auth token provided create on
         if not user_auth_token:
             onboarding_signature = self.onboarding_signer.create_signature(
-                self.network["onboardingUrl"], 
-                self.account.key)
+                self.network["onboardingUrl"],
+                self.account.privateKeyBytes 
+                )
 
             response = await self.authorize_signed_hash(onboarding_signature) 
             
@@ -733,7 +737,7 @@ class FireflyClient:
             params
             ) 
 
-    async def get_contract_addresses(self, symbol:MARKET_SYMBOLS=None):
+    async def get_contract_addresses(self, symbol:MARKET_SYMBOLS=MARKET_SYMBOLS.ETH):
         """
             Returns all contract addresses for the provided market.
             Inputs:

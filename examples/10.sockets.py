@@ -3,7 +3,7 @@ sys.path.append(os.getcwd()+"/src/")
 
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from bluefin_exchange_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS
 import asyncio
 TEST_NETWORK="SUI_STAGING"
 event_received = False

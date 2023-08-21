@@ -6,7 +6,7 @@
 '''
 import time, sys
 from config import TEST_ACCT_KEY, TEST_NETWORK, TEST_SUB_ACCT_KEY
-from bluefin_exchange_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, OrderSignatureRequest, ORDER_SIDE, ORDER_TYPE, SOCKET_EVENTS
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, OrderSignatureRequest, ORDER_SIDE, ORDER_TYPE, SOCKET_EVENTS
 import asyncio
 
 def callback(event):

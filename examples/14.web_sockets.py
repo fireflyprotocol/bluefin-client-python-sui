@@ -3,7 +3,7 @@ import sys,os
 sys.path.append(os.getcwd()+"/src/")
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from bluefin_exchange_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, config_logging
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, config_logging
 import asyncio
 import logging
 

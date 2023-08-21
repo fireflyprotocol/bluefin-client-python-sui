@@ -3,8 +3,8 @@ sys.path.append(os.getcwd()+"/src/")
 
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from firefly_exchange_client.utilities import toSuiBase
-from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, ORDER_STATUS
+from bluefin_client_sui.utilities import toSuiBase
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, ORDER_STATUS
 from pprint import pprint
 import asyncio
 

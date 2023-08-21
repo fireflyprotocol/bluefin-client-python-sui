@@ -1,8 +1,8 @@
 import sys,os
 sys.path.append(os.getcwd()+"/src/")
-from bluefin_exchange_client_sui.utilities import toSuiBase
+from bluefin_client_sui.utilities import toSuiBase
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from bluefin_exchange_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
 import asyncio
 
 

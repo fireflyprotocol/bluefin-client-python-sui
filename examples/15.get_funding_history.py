@@ -2,7 +2,7 @@
 import sys,os
 sys.path.append(os.getcwd()+"/src/")
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from bluefin_exchange_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, GetFundingHistoryRequest
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, GetFundingHistoryRequest
 from pprint import pprint
 import asyncio
 

@@ -4,7 +4,7 @@ import sys
 print (os.getcwd())
 sys.path.append(os.getcwd()+"/src/")
 
-from bluefin_exchange_client_sui import FireflyClient, Networks
+from bluefin_client_sui import FireflyClient, Networks
 from pprint import pprint
 import asyncio
 

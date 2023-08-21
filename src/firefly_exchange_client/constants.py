@@ -6,7 +6,7 @@ Networks = {
       "socketURL":"wss://dapi.api.sui-staging.bluefin.io",
       "dmsURL":"https://dapi.api.sui-staging.bluefin.io",
       "webSocketURL":"wss://notifications.api.sui-staging.bluefin.io",
-      "onboardingUrl": "https://testnet.bluefin.exchange",
+      "onboardingUrl": "https://testnet.bluefin.io",
 
   },
 

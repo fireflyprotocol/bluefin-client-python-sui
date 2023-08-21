@@ -2,21 +2,26 @@ from typing import TypedDict, List
 from .enumerations import *
 
 class Order(TypedDict):
+    market: str
+    price: int 
     isBuy: bool 
     reduceOnly: bool 
     quantity: int 
-    price: int 
-    triggerPrice: int 
+    postOnly: bool
+    orderbookOnly: bool
     leverage: int 
     expiration: int 
     salt: int   
     maker: str 
+    ioc: bool
+
 
 class SignedOrder(Order):
     typedSignature: str
 
 class RequiredOrderFields(TypedDict): 
-  symbol: MARKET_SYMBOLS # market for which to create order
+  #symbol: MARKET_SYMBOLS # market for which to create order
+  market: str
   price: int # price at which to place order. Will be zero for a market order
   quantity: int # quantity/size of order
   side: ORDER_SIDE # BUY/SELL
@@ -29,6 +34,10 @@ class OrderSignatureRequest(RequiredOrderFields):
   salt: int # (optional)  random number for uniqueness of order. Generated randomly if not provided
   expiration: int # (optional) time at which order will expire. Will be set to 1 month if not provided
   maker: str # (optional) maker of the order, if not provided the account used to initialize the client will be default maker
+  #isBuy: bool
+  postOnly: bool
+  orderBookOnly: bool
+  ioc: bool
 
 class OrderSignatureResponse(RequiredOrderFields):
   maker: str 

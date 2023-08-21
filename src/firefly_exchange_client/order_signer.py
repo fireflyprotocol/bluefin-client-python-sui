@@ -1,12 +1,13 @@
 from web3 import Web3
-from .utilities import bn_to_bytes8, hash_string, address_to_bytes32
+from .utilities import bn_to_bytes8, hash_string, address_to_bytes32,numberToHex, hexToByteArray
 from .constants import *
 from .signer import Signer
 from .interfaces import Order
-
+import hashlib
+import json
 
 class OrderSigner(Signer):
-    def __init__(self, network_id, orders_contract_address, domain="IsolatedTrader", version="1.0"):
+    def __init__(self, network_id, orders_contract_address="", domain="IsolatedTrader", version="1.0"):
         super().__init__()
         self.network_id = network_id
         self.contract_address = orders_contract_address 
@@ -14,21 +15,28 @@ class OrderSigner(Signer):
         self.version = version 
 
     def get_order_flags(self, order):
-        flag = 0 
-
-        if order["reduceOnly"]:
-            flag += ORDER_FLAGS["IS_DECREASE_ONLY"] 
-
-        if order["isBuy"]:
-            flag += ORDER_FLAGS["IS_BUY"] 
         
-        saltBytes = bn_to_bytes8(order["salt"])
-
-        return b''.join([
-            "0x".encode('utf-8'), 
-            saltBytes[-15:],
-            str(flag).encode('utf-8')
-            ]).decode().ljust(66, '0')
+        ''' 0th bit = ioc
+            1st bit = postOnly
+            2nd bit = reduceOnly
+            3rd bit  = isBuy
+            4th bit = orderbookOnly
+            e.g. 00000000 // all flags false
+            e.g. 00000001 // ioc order, sell side, can be executed by taker
+            e.e. 00010001 // same as above but can only be executed by settlement operator
+        '''
+        flag = 0 
+        if order['ioc']:
+            flag+=1
+        if order['postOnly']:
+            flag+=2
+        if order['reduceOnly']:
+            flag+=4
+        if order['isBuy']:
+            flag+=8
+        if order['orderbookOnly']:
+            flag+=16
+        return flag
     
     def get_domain_hash(self):
         """
@@ -60,32 +68,21 @@ class OrderSigner(Signer):
                 - str: order hash
         """
         flags = self.get_order_flags(order)
-        struct_hash = Web3.solidityKeccak(
-            abi_types=[
-                'bytes32',
-                'bytes32',
-                'uint256',
-                'uint256',
-                'uint256',
-                'uint256',
-                'bytes32',
-                'uint256'
-                ],
+        flags = hexToByteArray(numberToHex(flags,2))
+        
+        buffer=bytearray()
+        orderPriceHex=hexToByteArray(numberToHex(int(order["price"])))
+        orderQuantityHex=hexToByteArray(numberToHex(int(order['quantity'])))
+        orderLeverageHex=hexToByteArray (numberToHex(int(order['leverage'])))
+        orderSalt=hexToByteArray(numberToHex(int(order['salt'])))
+        orderExpiration=hexToByteArray(numberToHex(int(order['expiration']),16))
+        orderMaker=hexToByteArray(numberToHex(int(order['maker'],16),64))
+        orderMarket=hexToByteArray(numberToHex(int(order['market'],16),64))
+        bluefin=bytearray("Bluefin", encoding="utf-8")
 
-            values=[
-                hash_string(EIP712_ORDER_STRUCT_STRING),
-                flags,
-                int(order["quantity"]),
-                int(order["price"]),
-                int(order["triggerPrice"]),
-                int(order["leverage"]),
-                address_to_bytes32(order["maker"]),
-                int(order["expiration"])
-            ]
-        ).hex()
-
-        return self.get_eip712_hash(self.get_domain_hash(), struct_hash) if struct_hash else "" 
-
+        buffer=orderPriceHex+orderQuantityHex+orderLeverageHex+orderSalt+orderExpiration+orderMaker+orderMarket+flags+bluefin
+        return buffer.hex()
+        
     def sign_order(self, order:Order, private_key):
         """
             Used to create an order signature. The method will use the provided key 
@@ -99,7 +96,8 @@ class OrderSigner(Signer):
                 str: generated signature
         """
         order_hash = self.get_order_hash(order)
-        return self.sign_hash(order_hash, private_key, "01")
+        order_hash = hashlib.sha256(order_hash.encode("utf-8")).digest()
+        return self.sign_hash(order_hash, private_key, "")
 
     def sign_cancellation_hash(self,order_hash:list):
         """
@@ -112,20 +110,10 @@ class OrderSigner(Signer):
             Returns:
                 str: generated signature
         """
-        struct_hash = Web3.solidityKeccak(
-            abi_types=['bytes32','bytes32','bytes32'],
-            values=[
-                hash_string(EIP712_CANCEL_ORDER_STRUCT_STRING),
-                hash_string("Cancel Orders"),
-                Web3.solidityKeccak(
-                    abi_types=['bytes32' for i in range(len(order_hash))],
-                    values=[hash for hash in order_hash]
-                ).hex()
-            ]
-        ).hex()
-        return self.get_eip712_hash(self.get_domain_hash(), struct_hash) if struct_hash else ""
-
-
+        sigDict={}
+        sigDict['orderHashes']=order_hash
+        encodedMessage=self.encode_message(sigDict)
+        return encodedMessage        
 
 
 

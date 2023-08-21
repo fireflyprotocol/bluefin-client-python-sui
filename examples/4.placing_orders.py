@@ -1,7 +1,11 @@
+import sys,os
+sys.path.append(os.getcwd()+"/src/")
+
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
 import asyncio
 
+TEST_NETWORK="SUI_STAGING"
 
 
 async def place_limit_order(client: FireflyClient):
@@ -38,6 +42,7 @@ async def place_market_order(client: FireflyClient):
     user_leverage = await client.get_user_leverage(MARKET_SYMBOLS.ETH)
 
     # creates a LIMIT order to be signed
+    '''
     signature_request = OrderSignatureRequest(
         symbol=MARKET_SYMBOLS.ETH,  # market symbol
         price=0,  # price at which you want to place order
@@ -45,7 +50,22 @@ async def place_market_order(client: FireflyClient):
         side=ORDER_SIDE.BUY, 
         orderType=ORDER_TYPE.MARKET,
         leverage=user_leverage
-    )  
+    ) '''
+    signature_request = OrderSignatureRequest(
+        symbol=MARKET_SYMBOLS.ETH,
+        market = "0x25a869797387e2eaa09c658c83dc0deaba99bb02c94447339c06fdbe8287347e",
+        price = 0,
+        quantity = 1000000000,
+        leverage = 3000000000,
+        side = ORDER_SIDE.BUY,
+        reduceOnly = False,
+        postOnly = False,
+        orderbookOnly = True,
+        maker = "0xa3c3504d90c428274beaa89f1238a769ea1d1c3516c31c0f4157f33787367af0",
+        expiration = 1700530261000,
+        salt = 1668690862116,
+        orderType = ORDER_TYPE.MARKET,
+    )
 
     # create signed order
     signed_order = client.create_signed_order(signature_request) 

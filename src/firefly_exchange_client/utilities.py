@@ -6,6 +6,18 @@ import bip_utils
 import hashlib
 
 
+def numberToHex(num, pad=32):
+    #converting number to Hexadecimal format
+    hexNum=hex(num)
+
+    #padding it with zero to make the size 32 bytes
+    padHex=hexNum[2:].zfill(pad)
+    return padHex
+
+def hexToByteArray(hexStr):
+    return bytearray.fromhex(hexStr)
+
+
 def mnemonicToPrivateKey(seedPhrase: str)-> str:
     bip39_seed = bip_utils.Bip39SeedGenerator(seedPhrase).Generate()
     bip32_ctx = bip_utils.Bip32Slip10Ed25519.FromSeed(bip39_seed)

@@ -82,10 +82,11 @@ class FireflyClient:
                 self.network["onboardingUrl"],
                 self.account.privateKeyBytes 
                 )
-
+            onboarding_signature=onboarding_signature+self.account.publicKeyBase64.decode()
             response = await self.authorize_signed_hash(onboarding_signature) 
             
             if 'error' in response:
+
                 raise SystemError("Authorization error: {}".format(response['error']['message']))
 
             user_auth_token = response['token']
@@ -125,15 +126,14 @@ class FireflyClient:
           
         # if orders contract address is not provided get 
         # from addresses retrieved from dapi
-        if trader_contract == None:
-            try:
-                trader_contract = self.contracts.contract_addresses[symbol_str]["IsolatedTrader"]
-            except:
-                raise SystemError("Can't find orders contract address for market: {}".format(symbol_str))
+        #if trader_contract == None:
+        #    try:
+        #        trader_contract = self.contracts.contract_addresses[symbol_str]["IsolatedTrader"]
+        #    except:
+        #        raise SystemError("Can't find orders contract address for market: {}".format(symbol_str))
 
         self.order_signers[symbol_str] = OrderSigner(
             self.network["chainId"],
-            trader_contract
             )
         return True 
 
@@ -173,15 +173,18 @@ class FireflyClient:
             expiration += TIME["SECONDS_IN_A_MONTH"] 
 
         return Order (
+            market = params['market'],
             isBuy = params["side"] == ORDER_SIDE.BUY,
-            price = to_wei(params["price"], "ether"),
-            quantity =  to_wei(params["quantity"], "ether"),
-            leverage =  to_wei(default_value(params, "leverage", 1), "ether"),
+            price = params["price"],
+            quantity =  params["quantity"],
+            leverage =  default_value(params, "leverage", 1),
             maker =  params["maker"].lower() if "maker" in params else self.account.address.lower(),
             reduceOnly =  default_value(params, "reduceOnly", False),
-            triggerPrice =  0,
+            postOnly = default_value(params,"postOnly",False),
+            orderbookOnly = default_value(params, "orderbookOnly",True),
             expiration =  default_value(params, "expiration", expiration),
             salt =  default_value(params, "salt", random_number(1000000)),
+            ioc = default_value(params,"ioc", False )            
             )
 
     def create_signed_order(self, params:OrderSignatureRequest):
@@ -204,7 +207,8 @@ class FireflyClient:
         if not order_signer:
             raise SystemError("Provided Market Symbol({}) is not added to client library".format(symbol))
         
-        order_signature = order_signer.sign_order(order, self.account.key.hex())
+        order_signature = order_signer.sign_order(order, self.account.privateKeyBytes)
+        order_signature=order_signature+self.account.publicKeyBase64.decode()
         
         return OrderSignatureResponse(
             symbol=symbol,
@@ -217,7 +221,9 @@ class FireflyClient:
             expiration=order["expiration"],
             orderSignature=order_signature,
             orderType=params["orderType"],
-            maker=order["maker"]
+            maker=order["maker"],
+            orderbookOnly=params["orderbookOnly"]
+
         )
     
     def create_signed_cancel_order(self,params:OrderSignatureRequest, parentAddress:str=""):
@@ -253,10 +259,9 @@ class FireflyClient:
         """
         if type(order_hash)!=list:
             order_hash = [order_hash]
-
         order_signer:OrderSigner = self._get_order_signer(symbol)
-        cancel_hash = order_signer.sign_cancellation_hash(order_hash)
-        hash_sig = order_signer.sign_hash(cancel_hash,self.account.key.hex(), "01")
+        cancel_hash = order_signer.sign_cancellation_hash(order_hash )
+        hash_sig = order_signer.sign_hash(cancel_hash,self.account.privateKeyBytes,"")+self.account.publicKeyBase64.decode()
         return OrderCancellationRequest(
             symbol=symbol.value,
             hashes=order_hash,
@@ -327,10 +332,11 @@ class FireflyClient:
         return await self.apis.post(
             SERVICE_URLS["ORDERS"]["ORDERS"],
             {
+            "orderbookOnly": params["orderbookOnly"],
             "symbol": params["symbol"],
-            "price": to_wei(params["price"], "ether"),
-            "quantity": to_wei(params["quantity"], "ether"),
-            "leverage": to_wei(params["leverage"], "ether"),
+            "price": params["price"],
+            "quantity": params["quantity"],
+            "leverage": params["leverage"],
             "userAddress": params["maker"],
             "orderType": params["orderType"].value,
             "side": params["side"].value,            
@@ -428,8 +434,7 @@ class FireflyClient:
 
         user_position = await self.get_user_position({"symbol":symbol, "parentAddress": parentAddress})
         
-        account_address = Web3.toChecksumAddress(self.account.address if parentAddress == "" else parentAddress)
-            
+        account_address = self.account.address if parentAddress=="" else parentAddress
         # implies user has an open position on-chain, perform on-chain leverage update
         if(user_position != {}):
             perp_contract = self.contracts.get_contract(name="Perpetual", market=symbol.value) 

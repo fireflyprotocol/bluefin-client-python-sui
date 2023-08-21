@@ -1,8 +1,13 @@
+import sys,os
+sys.path.append(os.getcwd()+"/src/")
+
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, ORDER_STATUS
 from pprint import pprint
 import asyncio
+TEST_NETWORK="SUI_STAGING"
+
 
 
 async def main():
@@ -12,18 +17,24 @@ async def main():
 
     # must add market before cancelling its orders
     client.add_market(MARKET_SYMBOLS.ETH)
+    #client.create_order_to_sign()
+    await client.adjust_leverage(MARKET_SYMBOLS.ETH, 1) 
 
     order = {
+        "market": "0x25a869797387e2eaa09c658c83dc0deaba99bb02c94447339c06fdbe8287347e",
         "symbol":MARKET_SYMBOLS.ETH, 
-        "price":1301, 
-        "quantity":0.1, 
+        "price": 0, 
+        "quantity":1000000000, 
         "side":ORDER_SIDE.SELL, 
         "orderType":ORDER_TYPE.LIMIT,
-        "leverage":await client.get_user_leverage(MARKET_SYMBOLS.ETH),
-        "expiration":int(time.time()+(30*24*60*60)), # a random time in future
+        "leverage":await client.get_user_leverage(MARKET_SYMBOLS.ETH)*1000000000,
+        "expiration":int(time.time()+(30*24*60*60))*1000, # a random time in future
         "reduceOnly":False,
         "salt":10,
-        "postOnly":True
+        "postOnly":False,
+        "orderType": ORDER_TYPE.MARKET,
+        "orderbookOnly": True
+
     }
 
 

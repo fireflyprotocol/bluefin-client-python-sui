@@ -1,4 +1,9 @@
 from config import TEST_ACCT_KEY, TEST_NETWORK
+import os
+import sys
+print (os.getcwd())
+sys.path.append(os.getcwd()+"/src/")
+
 from firefly_exchange_client import FireflyClient, Networks
 from pprint import pprint
 import asyncio

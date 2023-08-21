@@ -1,9 +1,12 @@
+import sys,os
+sys.path.append(os.getcwd()+"/src/")
+
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS
 import asyncio
 
 
-
+TEST_NETWORK="SUI_STAGING"
 
 async def main():
 

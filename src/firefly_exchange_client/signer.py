@@ -2,6 +2,7 @@ from web3 import Web3
 import eth_account
 import nacl
 import hashlib
+import json
 class Signer:
     def __init__(self):
         pass
@@ -34,3 +35,13 @@ class Signer:
         """
         result= nacl.signing.SigningKey(private_key).sign(hash)[:64]
         return result.hex()+'1' + append
+    
+
+    def encode_message(self,msg: dict):
+        msg=json.dumps(msg,separators=(',', ':'))
+        msg_bytearray=bytearray(msg.encode("utf-8"))
+        intent=bytearray()
+        intent.extend([3,0,0, len(msg_bytearray)])
+        intent=intent+msg_bytearray
+        hash=hashlib.blake2b(intent,digest_size=32)
+        return hash.digest()

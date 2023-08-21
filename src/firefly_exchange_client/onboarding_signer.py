@@ -1,7 +1,8 @@
 from web3 import Web3
 from .interfaces import *
 from .signer import Signer
-import hashlib
+import hashlib        
+import json
 
 class OnboardingSigner(Signer):
     def __init__(self):
@@ -16,6 +17,15 @@ class OnboardingSigner(Signer):
             Returns:
                 - str: signed msg hash
         """
-        hash=hashlib.sha256(msg.encode(encoding=encoding))
+        #temporary
+        msgDict={}
+        msgDict['onboardingUrl']=msg
+        msg=json.dumps(msgDict,separators=(',', ':'))
+        msg_bytearray=bytearray(msg.encode("utf-8"))
+        intent=bytearray()
+        intent.extend([3,0,0, len(msg_bytearray)])
+        intent=intent+msg_bytearray
+
+        hash=hashlib.blake2b(intent,digest_size=32)
         return self.sign_hash(hash.digest(), private_key)
 

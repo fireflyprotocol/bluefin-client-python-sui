@@ -6,8 +6,8 @@ import sys,os
 sys.path.append(os.getcwd()+"/src/")
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
-from firefly_exchange_client.utilities import toSuiBase
+from bluefin_exchange_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
+from bluefin_exchange_client_sui.utilities import toSuiBase
 import asyncio
 TEST_NETWORK="SUI_STAGING"
 

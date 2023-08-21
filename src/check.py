@@ -1,4 +1,4 @@
-from firefly_exchange_client import FireflyClient, Networks
+from bluefin_exchange_client_sui import FireflyClient, Networks
 from pprint import pprint
 import asyncio
 TEST_ACCT_KEY="!#12"

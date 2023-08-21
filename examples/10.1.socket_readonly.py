@@ -1,7 +1,12 @@
+import sys,os
+sys.path.append(os.getcwd()+"/src/")
+
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS
 import asyncio
+
+TEST_NETWORK="SUI_STAGING"
 
 event_received = False
 

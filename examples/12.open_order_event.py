@@ -3,10 +3,13 @@ The code example opens socket connection and listens to user order update events
 It places a limit order and as soon as its OPENED on order book, we receive
 an event, log its data and terminate connection
 '''
+import sys,os
+sys.path.append(os.getcwd()+"/src/")
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
 import asyncio
+TEST_NETWORK="SUI_STAGING"
 
 event_received = False
 
@@ -16,16 +19,18 @@ event_received = False
 async def place_limit_order(client:FireflyClient):
        
     # default leverage of account is set to 3 on firefly
+    await client.adjust_leverage(MARKET_SYMBOLS.ETH,1)
     user_leverage = await client.get_user_leverage(MARKET_SYMBOLS.ETH)
+    
 
     # creates a LIMIT order to be signed
     signature_request = OrderSignatureRequest(
         symbol=MARKET_SYMBOLS.ETH,  # market symbol
-        price=1300,  # price at which you want to place order
-        quantity=0.01, # quantity
+        price=1300000000000,  # price at which you want to place order
+        quantity=10000000, # quantity
         side=ORDER_SIDE.SELL, 
         orderType=ORDER_TYPE.LIMIT,
-        leverage=user_leverage
+        leverage=1000000000
     )  
 
     # create signed order

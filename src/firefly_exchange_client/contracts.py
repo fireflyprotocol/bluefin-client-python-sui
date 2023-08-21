@@ -85,4 +85,16 @@ class Contracts:
                 return self.contract_addresses
         except Exception as e:
             raise(Exception("Failed to get contract address, Exception: {}".format(e)))
+        
 
+        
+    def get_market_id(self,market: str)-> str:
+        """
+            Returns the market id/Perpetual ID for the respective market.
+            Inputs: 
+                - market(str) the name of the market for which you need perp id e.g ETH-PERP
+        """
+        return self.contract_addresses[market.value]['Perpetual']['id']
+
+
+    

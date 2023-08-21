@@ -40,7 +40,7 @@ class FireflyClient:
                 api_token(string, optional): API token to initialize client in read-only mode 
         """
         self.contracts.contract_addresses = await self.get_contract_addresses()
-
+        self.contracts.set_contract_addresses(self.contracts.contract_addresses)
 #        if "error" in self.contracts.contract_addresses:
 #            raise Exception("Error initializing client: {}".format(self.contracts.contract_addresses["error"]))
 
@@ -168,12 +168,14 @@ class FireflyClient:
         # MARKET ORDER set expiration of 1 minute
         if (params["orderType"] == ORDER_TYPE.MARKET):
             expiration += TIME["SECONDS_IN_A_MINUTE"]
+            expiration*=1000
         # LIMIT ORDER set expiration of 30 days
         else:
-            expiration += TIME["SECONDS_IN_A_MONTH"] 
-
+            expiration += TIME["SECONDS_IN_A_MONTH"]
+            expiration*=1000
+         
         return Order (
-            market = params['market'],
+            market = default_value(params,'market',self.contracts.get_market_id(params['symbol'])),
             isBuy = params["side"] == ORDER_SIDE.BUY,
             price = params["price"],
             quantity =  params["quantity"],
@@ -222,7 +224,7 @@ class FireflyClient:
             orderSignature=order_signature,
             orderType=params["orderType"],
             maker=order["maker"],
-            orderbookOnly=params["orderbookOnly"]
+            orderbookOnly=default_value(params,'orderbookOnly',True)
 
         )
     
@@ -242,7 +244,7 @@ class FireflyClient:
             signer:OrderSigner = self._get_order_signer(params["symbol"])
             order_to_sign = self.create_order_to_sign(params)
             hash = signer.get_order_hash(order_to_sign)
-            return self.create_signed_cancel_orders(params["symbol"], hash, parentAddress)
+            return self.create_signed_cancel_orders(params["symbol"], hash.hex(), parentAddress)
         except Exception as e:
             return ""
 

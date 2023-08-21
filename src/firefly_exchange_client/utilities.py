@@ -4,6 +4,11 @@ from web3 import Web3
 import time
 import bip_utils
 import hashlib
+from typing import Union
+from .constants import SUI_BASE_NUM
+
+def toSuiBase(number: Union[int,float]) -> int:
+    return int(number*SUI_BASE_NUM)
 
 
 def numberToHex(num, pad=32):

@@ -81,8 +81,8 @@ class OrderSigner(Signer):
         bluefin=bytearray("Bluefin", encoding="utf-8")
 
         buffer=orderPriceHex+orderQuantityHex+orderLeverageHex+orderSalt+orderExpiration+orderMaker+orderMarket+flags+bluefin
-        return buffer.hex()
-        
+        order_hash=hashlib.sha256(buffer).digest()
+        return order_hash        
     def sign_order(self, order:Order, private_key):
         """
             Used to create an order signature. The method will use the provided key 
@@ -96,7 +96,6 @@ class OrderSigner(Signer):
                 str: generated signature
         """
         order_hash = self.get_order_hash(order)
-        order_hash = hashlib.sha256(order_hash.encode("utf-8")).digest()
         return self.sign_hash(order_hash, private_key, "")
 
     def sign_cancellation_hash(self,order_hash:list):

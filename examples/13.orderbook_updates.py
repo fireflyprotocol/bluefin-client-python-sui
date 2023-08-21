@@ -2,10 +2,14 @@
 When ever the state of orderbook changes, an event is emitted by exchange.
 In this code example we open a socket connection and listen to orderbook update event
 '''
+import sys,os
+sys.path.append(os.getcwd()+"/src/")
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
+from firefly_exchange_client.utilities import toSuiBase
 import asyncio
+TEST_NETWORK="SUI_STAGING"
 
 event_received = False
 
@@ -17,11 +21,11 @@ async def place_limit_order(client:FireflyClient):
     # creates a LIMIT order to be signed
     signature_request = OrderSignatureRequest(
         symbol=MARKET_SYMBOLS.ETH,  # market symbol
-        price=1300,  # price at which you want to place order
-        quantity=0.01, # quantity
+        price=toSuiBase(1300),  # price at which you want to place order
+        quantity=toSuiBase(0.01), # quantity
         side=ORDER_SIDE.SELL, 
         orderType=ORDER_TYPE.LIMIT,
-        leverage= user_leverage
+        leverage= toSuiBase(1)
     )  
     # create signed order
     signed_order = client.create_signed_order(signature_request) 

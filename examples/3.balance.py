@@ -5,7 +5,6 @@ from config import TEST_ACCT_KEY, TEST_NETWORK
 from firefly_exchange_client import FireflyClient, Networks
 import asyncio
 
-TEST_NETWORK="SUI_STAGING"
 
 
 async def main():
@@ -22,6 +21,7 @@ async def main():
 
   # checks chain native token balance.
   # A user must have native tokens to perform contract calls
+  
   print('Chain token balance:', await client.get_native_chain_token_balance()) 
 
   # check margin bank balance on-chain

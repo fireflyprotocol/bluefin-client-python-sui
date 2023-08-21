@@ -6,8 +6,6 @@ from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS
 import asyncio
 
 
-TEST_NETWORK="SUI_STAGING"
-
 async def main():
 
     # initialize client

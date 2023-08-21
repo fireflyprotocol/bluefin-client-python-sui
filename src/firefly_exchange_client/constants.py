@@ -130,3 +130,7 @@ EIP712_DOMAIN_STRING_NO_CONTRACT = \
     "string version," + \
     "uint128 chainId" + \
     ")"
+
+
+
+SUI_BASE_NUM=1000000000

@@ -10,7 +10,7 @@
 
 </div>
 
-Python Client for the Firefly Exchange API and Smart Contracts.
+Python Client for the Firefly Exchange API and Smart Contracts for SUI.
 ​
 
 ### Install

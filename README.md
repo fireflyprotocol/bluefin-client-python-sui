@@ -18,7 +18,7 @@ Python Client for the Firefly Exchange API and Smart Contracts for SUI.
 The package can be installed from [PyPi](https://pypi.org/project/firefly-exchange-client/) using pip:
 
 ```
-pip install firefly-exchange-client
+pip install bluefin_client_sui
 ```
 
 Alternatively, you could run:
@@ -35,28 +35,27 @@ When initializing the client, users must accept [terms and conditions](https://f
 
 ```json
 {
-    "url": "https://goerli-rollup.arbitrum.io/rpc",
-    "chainId": 421613,
-    "apiGateway": "https://dapi-testnet.firefly.exchange",
-    "socketURL": "wss://dapi-testnet.firefly.exchange",
-    "webSocketURL": "",
-    "onboardingUrl": "https://testnet.firefly.exchange",
-},
+      "apiGateway":"https://dapi.api.sui-staging.bluefin.io",
+      "socketURL":"wss://dapi.api.sui-staging.bluefin.io",
+      "dmsURL":"https://dapi.api.sui-staging.bluefin.io",
+      "webSocketURL":"wss://notifications.api.sui-staging.bluefin.io",
+      "onboardingUrl": "https://testnet.bluefin.io"
+}
 ```
 
 Users can import predefined networks from [constants](https://github.com/fireflyprotocol/firefly_exchange_client/blob/main/src/firefly_exchange_client/constants.py):
 
 ```python
-from firefly_exchange_client import Networks
+from bluefin_client_sui import Networks
 ```
 
-For testing purposes use `Networks[TESTNET_ARBITRUM]` and for production please use `Networks[MAINNET_ARBITRUM]`
+For testing purposes use `Networks[SUI_STAGING]` and for production please use `Networks[SUI_PROD]`. Currently only SUI_STAGING is available.
 
 ## Initialization example​
 
 ```python
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from firefly_exchange_client import FireflyClient, Networks
+from bluefin_client_sui import FireflyClient, Networks
 from pprint import pprint
 import asyncio
 
@@ -92,7 +91,7 @@ if __name__ == "__main__":
 Firefly-client can also be initialized in `read-only` mode, below is the example:
 ```python
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from firefly_exchange_client import FireflyClient, Networks
+from bluefin_client_sui import FireflyClient, Networks
 from pprint import pprint
 import asyncio
 
@@ -123,7 +122,8 @@ if __name__ == "__main__":
 
 ```python
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from firefly_exchange_client import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
+from bluefin_client_sui.utilities import toSuiBase
 import asyncio
 
 async def main():
@@ -144,11 +144,11 @@ async def main():
     # creates a LIMIT order to be signed
     signature_request = OrderSignatureRequest(
         symbol=MARKET_SYMBOLS.ETH,  # market symbol
-        price=1900,  # price at which you want to place order
-        quantity=0.01, # quantity
+        price=toSuiBase(1900),  # price at which you want to place order
+        quantity=toSuiBase(0.01), # quantity
         side=ORDER_SIDE.SELL,
         orderType=ORDER_TYPE.LIMIT,
-        leverage=user_leverage
+        leverage=toSuiBase(user_leverage)
     )
 
     # create signed order
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
 ```python
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from firefly_exchange_client import FireflyClient, Networks, SOCKET_EVENTS
+from bluefin_client_sui import FireflyClient, Networks, SOCKET_EVENTS
 import asyncio
 import time
 
@@ -216,7 +216,7 @@ Look at the [example](https://github.com/fireflyprotocol/firefly_exchange_client
 
 ```python
 from config import TEST_ACCT_KEY, TEST_NETWORK
-from firefly_exchange_client import FireflyClient, Networks, SOCKET_EVENTS, MARKET_SYMBOLS
+from bluefin_client_sui import FireflyClient, Networks, SOCKET_EVENTS, MARKET_SYMBOLS
 import time
 import asyncio
 

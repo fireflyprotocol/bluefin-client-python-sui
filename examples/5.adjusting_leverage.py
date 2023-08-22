@@ -27,7 +27,7 @@ async def main():
 
     print('Leverage on ETH market:', await client.get_user_leverage(MARKET_SYMBOLS.ETH))
     # since we don't have a position on-chain, it will perform off-chain leverage adjustment
-    await client.adjust_leverage(MARKET_SYMBOLS.ETH, 4) 
+    await client.adjust_leverage(MARKET_SYMBOLS.ETH, 7) 
 
     print('Leverage on ETH market:', await client.get_user_leverage(MARKET_SYMBOLS.ETH))
     

@@ -5,7 +5,13 @@ import time
 import bip_utils
 import hashlib
 from typing import Union
-from .constants import SUI_BASE_NUM
+from .constants import SUI_BASE_NUM, DAPI_BASE_NUM
+
+def toDapiBase(number: Union[int, float])->int:
+    return int(number*DAPI_BASE_NUM)
+
+def fromDapiBase(number: Union[int, float], dtype=int)-> int:
+    return dtype(number/DAPI_BASE_NUM)
 
 def toSuiBase(number: Union[int,float]) -> int:
     return int(number*SUI_BASE_NUM)

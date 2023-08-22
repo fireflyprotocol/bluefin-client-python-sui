@@ -440,7 +440,7 @@ class FireflyClient:
             perp_contract = self.contracts.get_contract(name="Perpetual", market=symbol.value) 
             construct_txn = perp_contract.functions.adjustLeverage(
                 account_address, 
-                to_wei(leverage, "ether")).buildTransaction({
+                toDapiBase(leverage)).buildTransaction({
                     'from': self.account.address,
                     'nonce': self.w3.eth.getTransactionCount(self.account.address),
                     })            
@@ -452,7 +452,7 @@ class FireflyClient:
                 {
                     "symbol": symbol.value,
                     "address": account_address,
-                    "leverage": to_wei(leverage, "ether"),
+                    "leverage": toDapiBase(leverage),
                     "marginType": MARGIN_TYPE.ISOLATED.value,
                     },
                 auth_required=True
@@ -866,9 +866,7 @@ class FireflyClient:
         
         for i in account_data_by_market:
             if symbol.value==i["symbol"]:
-                return int(i["selectedLeverage"])
-                #return int(from_wei(int(i["selectedLeverage"]), "ether"))    
-
+                return fromDapiBase(int(i["selectedLeverage"]))
         # default leverage on system is 3
         # todo fetch from exchange info route
         return 3

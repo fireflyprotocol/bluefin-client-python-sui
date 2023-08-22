@@ -1,6 +1,9 @@
 ---
 name: publish_to_pypi
 on:
+  push:
+    branches:
+      - quant-852
   pull_request:
     branches:
       - main

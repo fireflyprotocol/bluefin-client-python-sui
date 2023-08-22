@@ -1,5 +1,4 @@
-from web3 import Web3
-from .utilities import bn_to_bytes8, hash_string, address_to_bytes32,numberToHex, hexToByteArray
+from .utilities import bn_to_bytes8, address_to_bytes32,numberToHex, hexToByteArray
 from .constants import *
 from .signer import Signer
 from .interfaces import Order
@@ -42,24 +41,11 @@ class OrderSigner(Signer):
         """
             Returns domain hash
         """
-        return Web3.solidityKeccak(
-        [
-            'bytes32',
-            'bytes32',
-            'bytes32',
-            'uint256',
-            'bytes32'
-        ],
-        [
-            hash_string(EIP712_DOMAIN_STRING),
-            hash_string(self.domain),
-            hash_string(self.version),
-            self.network_id,
-            address_to_bytes32(self.contract_address)
-        ]
-    ).hex()
+        ### todo
+        return ""
+       
 
-    def get_order_hash(self, order:Order):
+    def get_order_hash(self, order:Order, withBufferHex=True):
         """
             Returns order hash.
             Inputs:
@@ -81,7 +67,13 @@ class OrderSigner(Signer):
         bluefin=bytearray("Bluefin", encoding="utf-8")
 
         buffer=orderPriceHex+orderQuantityHex+orderLeverageHex+orderSalt+orderExpiration+orderMaker+orderMarket+flags+bluefin
-        order_hash=hashlib.sha256(buffer).digest()
+        
+        #for cancel order signature verification we use buffer directly
+        # for placing order we use buffer.hex().encode("utf-8")
+        if withBufferHex:
+            order_hash=hashlib.sha256(buffer.hex().encode("utf-8")).digest()
+        else:
+            order_hash=hashlib.sha256(buffer).digest()
         return order_hash        
     def sign_order(self, order:Order, private_key):
         """

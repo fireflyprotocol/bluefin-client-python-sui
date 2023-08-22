@@ -1,4 +1,3 @@
-from web3 import Web3
 from .interfaces import *
 from .signer import Signer
 import hashlib        
@@ -17,7 +16,6 @@ class OnboardingSigner(Signer):
             Returns:
                 - str: signed msg hash
         """
-        #temporary
         msgDict={}
         msgDict['onboardingUrl']=msg
         msg=json.dumps(msgDict,separators=(',', ':'))

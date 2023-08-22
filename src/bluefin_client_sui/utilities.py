@@ -1,6 +1,6 @@
 from datetime import datetime
 from random import randint
-from web3 import Web3
+#from web3 import Web3
 import time
 import bip_utils
 import hashlib
@@ -56,10 +56,6 @@ def strip_hex_prefix(input):
 
 def address_to_bytes32(addr):
     return '0x000000000000000000000000' + strip_hex_prefix(addr)
-
-
-def hash_string(value: str): 
-    return Web3.soliditySha3(["string"], [value] ).hex()
 
 def bn_to_bytes8(value:int):
     return str("0x"+"0"*16+hex(value)[2:]).encode('utf-8')

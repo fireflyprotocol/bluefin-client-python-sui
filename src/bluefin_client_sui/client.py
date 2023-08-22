@@ -6,19 +6,19 @@ from .onboarding_signer import OnboardingSigner
 from .utilities import *
 from .constants import TIME, SERVICE_URLS
 from .interfaces import *
-from .sockets import Sockets
+from .sockets_lib import Sockets
 from .enumerations import *
 from .websocket_client import WebsocketClient
 from .account import *
 
-from eth_account import Account
-from eth_utils import to_wei, from_wei
+#from eth_account import Account
+#from eth_utils import to_wei, from_wei
 
 class FireflyClient:
     def __init__(self, are_terms_accepted, network, private_key=""):
         self.are_terms_accepted = are_terms_accepted
         self.network = network
-        self.w3 = self._connect_w3(self.network["url"])
+        self.w3 = ''#self._connect_w3(self.network["url"])
         if private_key != "":
             #currently we only support seed phrase 
             self.account=SuiWallet(seed=private_key)
@@ -243,7 +243,7 @@ class FireflyClient:
         try:
             signer:OrderSigner = self._get_order_signer(params["symbol"])
             order_to_sign = self.create_order_to_sign(params)
-            hash = signer.get_order_hash(order_to_sign)
+            hash = signer.get_order_hash(order_to_sign, withBufferHex=False)
             return self.create_signed_cancel_orders(params["symbol"], hash.hex(), parentAddress)
         except Exception as e:
             return ""
@@ -369,8 +369,7 @@ class FireflyClient:
         usdc_contract = self.contracts.get_contract(name="USDC") 
         mb_contract = self.contracts.get_contract(name="MarginBank") 
 
-        amount = to_wei(amount,"mwei") 
-
+        
         # approve funds on usdc
         
         construct_txn = usdc_contract.functions.approve(
@@ -406,8 +405,7 @@ class FireflyClient:
         """
 
         mb_contract = self.contracts.get_contract(name="MarginBank")
-        amount = to_wei(amount,"mwei")
-
+        
         # withdraw from margin bank
         construct_txn = mb_contract.functions.withdrawFromBank(
             self.account.address, 
@@ -868,7 +866,8 @@ class FireflyClient:
         
         for i in account_data_by_market:
             if symbol.value==i["symbol"]:
-                return int(from_wei(int(i["selectedLeverage"]), "ether"))    
+                return int(i["selectedLeverage"])
+                #return int(from_wei(int(i["selectedLeverage"]), "ether"))    
 
         # default leverage on system is 3
         # todo fetch from exchange info route

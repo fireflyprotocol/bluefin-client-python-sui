@@ -1,5 +1,3 @@
-from web3 import Web3
-import eth_account
 import nacl
 import hashlib
 import json
@@ -7,28 +5,6 @@ class Signer:
     def __init__(self):
         pass
         
-
-    def get_eip712_hash(self, domain_hash, struct_hash):
-        """
-            Returns the EIP712 hash.
-            Inputs:
-                - domain_hash: chain domain hash
-                - struct_hash: struct hash of information to be signed
-        """
-        return Web3.solidityKeccak(
-        [
-            'bytes2',
-            'bytes32',
-            'bytes32'
-        ],
-        [
-            '0x1901',
-            domain_hash,
-            struct_hash
-        ]
-    ).hex()
-
-
     def sign_hash(self, hash, private_key, append=''):
         """
             Signs the hash and returns the signature. 
@@ -41,7 +17,29 @@ class Signer:
         msg=json.dumps(msg,separators=(',', ':'))
         msg_bytearray=bytearray(msg.encode("utf-8"))
         intent=bytearray()
-        intent.extend([3,0,0, len(msg_bytearray)])
+        encodeLengthBCS=self.decimal_to_bcs(len(msg_bytearray))
+        intent.extend([3,0,0])
+        intent.extend(encodeLengthBCS)
         intent=intent+msg_bytearray
         hash=hashlib.blake2b(intent,digest_size=32)
         return hash.digest()
+    
+    def decimal_to_bcs(self,num):
+        # Initialize an empty list to store the BCS bytes
+        bcs_bytes = []
+        while num > 0:
+            # Take the last 7 bits of the number
+            bcs_byte = num & 0x7F
+
+            # Set the most significant bit (MSB) to 1 if there are more bytes to follow
+            if num > 0x7F:
+                bcs_byte |= 0x80
+
+            # Append the BCS byte to the list
+            bcs_bytes.append(bcs_byte)
+
+            # Right-shift the number by 7 bits to process the next portion
+            num >>= 7
+
+        return bcs_bytes
+        

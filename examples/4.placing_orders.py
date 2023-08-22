@@ -15,11 +15,11 @@ async def place_limit_order(client: FireflyClient):
     # creates a LIMIT order to be signed
     signature_request = OrderSignatureRequest(
         symbol=MARKET_SYMBOLS.ETH,  # market symbol
-        price=toSuiBase(1632.8),  # price at which you want to place order
+        price=toSuiBase(1636.8),  # price at which you want to place order
         quantity=toSuiBase(0.01), # quantity
         side=ORDER_SIDE.BUY, 
         orderType=ORDER_TYPE.LIMIT,
-        leverage=toSuiBase(user_leverage)
+        leverage=toSuiBase(1)
     )  
 
     # create signed order
@@ -55,7 +55,7 @@ async def place_market_order(client: FireflyClient):
        # market = "0x25a869797387e2eaa09c658c83dc0deaba99bb02c94447339c06fdbe8287347e",
         price = toSuiBase(0),
         quantity = toSuiBase(1),
-        leverage = toSuiBase(user_leverage),
+        leverage = toSuiBase(1),
         side = ORDER_SIDE.BUY,
         reduceOnly = False,
         postOnly = False,

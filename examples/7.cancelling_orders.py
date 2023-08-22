@@ -1,10 +1,10 @@
-import sys,os
+import sys,os, random
 sys.path.append(os.getcwd()+"/src/")
 
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from bluefin_client_sui.utilities import toSuiBase
-from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, ORDER_STATUS
+from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, ORDER_STATUS, OrderSignatureRequest
 from pprint import pprint
 import asyncio
 
@@ -21,21 +21,32 @@ async def main():
     #await client.adjust_leverage(MARKET_SYMBOLS.ETH, 1) 
 
     order = {
-        "market": "0x25a869797387e2eaa09c658c83dc0deaba99bb02c94447339c06fdbe8287347e",
+        #"market": "0x25a869797387e2eaa09c658c83dc0deaba99bb02c94447339c06fdbe8287347e",
         "symbol":MARKET_SYMBOLS.ETH, 
-        "price": toSuiBase(0), 
+        "price": toSuiBase(1000), 
         "quantity":toSuiBase(1), 
         "side":ORDER_SIDE.SELL, 
         "orderType":ORDER_TYPE.LIMIT,
-        "leverage":toSuiBase(await client.get_user_leverage(MARKET_SYMBOLS.ETH)),
+        "leverage":toSuiBase(1),
         "expiration":int(time.time()+(30*24*60*60))*1000, # a random time in future
         "reduceOnly":False,
-        "salt":100,
+        "salt":111000000,
         "postOnly":False,
-        "orderType": ORDER_TYPE.MARKET,
+        "orderType": ORDER_TYPE.LIMIT,
         "orderbookOnly": True
 
     }
+        # creates a LIMIT order to be signed
+    order = OrderSignatureRequest(
+        symbol=MARKET_SYMBOLS.ETH,  # market symbol
+        price=toSuiBase(1636.8),  # price at which you want to place order
+        quantity=toSuiBase(0.01), # quantity
+        side=ORDER_SIDE.BUY, 
+        orderType=ORDER_TYPE.LIMIT,
+        leverage=toSuiBase(1),
+        salt=random.randint(0,100000000),
+        expiration=int(time.time()+(30*24*60*60))*1000
+    ) 
 
 
     signed_order = client.create_signed_order(order) 

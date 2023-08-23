@@ -1,7 +1,7 @@
 import requests
 import json
 
-def rpc_unsafe_moveCall(url,params, function_name: str, function_library: str, userAddress ,packageId, perpetualId, gasBudget=100000000 ):
+def rpc_unsafe_moveCall(url,params, function_name: str, function_library: str, userAddress ,packageId, gasBudget=100000000 ):
     base_dict={}
     base_dict["jsonrpc"]="2.0"
     base_dict["id"]=1689764924887
@@ -11,8 +11,7 @@ def rpc_unsafe_moveCall(url,params, function_name: str, function_library: str, u
     base_dict["params"].append([])
     base_dict["params"].append(params)
 
-    #what to add here ?
-    base_dict["params"].append("0x5a2c9b83ff5f45fef35d49ac741537ba62057ae70464d59e306ce52edb4f7fce")
+    base_dict["params"].append(None)
     base_dict["params"].append(str(gasBudget))
 
     payload=json.dumps(base_dict)
@@ -46,7 +45,19 @@ def rpc_sui_executeTransactionBlock(url, txBytes, signature):
     result=json.loads(response.text)
     return result
 
+
+def rpc_get_usdc_coins(url, params, method="suix_getCoins"):
+    base_dict={}
+    base_dict["jsonrpc"]="2.0"
+    base_dict["id"]= 1
+    base_dict["method"]=method
+    base_dict["params"]=params
+    payload=json.dumps(base_dict) 
     
+    headers = {'Content-Type': 'application/json' }
+    response = requests.request("POST", url, headers=headers, data=payload)
+    result=json.loads(response.text)
+    return result["result"]
 
 """
 

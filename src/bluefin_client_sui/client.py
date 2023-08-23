@@ -345,7 +345,7 @@ class FireflyClient:
             )
 
     ## Contract calls
-    async def deposit_margin_to_bank(self, amount):
+    async def deposit_margin_to_bank(self, amount: int, coin_id: str)-> bool:
         """
             Deposits given amount of USDC from user's account to margin bank
 
@@ -355,34 +355,21 @@ class FireflyClient:
             Returns:
                 Boolean: true if amount is successfully deposited, false otherwise
         """
-
-        usdc_contract = self.contracts.get_contract(name="USDC") 
-        mb_contract = self.contracts.get_contract(name="MarginBank") 
-
+        package_id=self.contracts.get_package_id()
+        user_address=self.account.getUserAddress()
+        callArgs=[]
+        callArgs.append(self.contracts.get_bank_id())
+        callArgs.append(self.account.getUserAddress())
+        callArgs.append(str(amount))
+        callArgs.append(coin_id)
+        txBytes=rpc_unsafe_moveCall("https://fullnode.testnet.sui.io:443", callArgs, "deposit_to_bank","margin_bank",user_address, package_id)
+        signature=self.contract_signer.sign_tx(txBytes, self.account)
+        res=rpc_sui_executeTransactionBlock("https://fullnode.testnet.sui.io:443",
+                                        txBytes,
+                                        signature)
         
-        # approve funds on usdc
 
-        
-        construct_txn = usdc_contract.functions.approve(
-            mb_contract.address, 
-            amount).buildTransaction({
-                'from': self.account.address,
-                'nonce': self.w3.eth.getTransactionCount(self.account.address),
-            })
-
-        self._execute_tx(construct_txn)
-
-        # deposit to margin bank
-        construct_txn = mb_contract.functions.depositToBank(
-            self.account.address, 
-            amount).buildTransaction({
-                'from': self.account.address,
-                'nonce': self.w3.eth.getTransactionCount(self.account.address),
-                })
-
-        self._execute_tx(construct_txn)
-
-        return True
+        return res
 
     async def withdraw_margin_from_bank(self, amount):
         """
@@ -397,9 +384,6 @@ class FireflyClient:
 
         bank_id=self.contracts.get_bank_id()
         account_address=self.account.getUserAddress()
-        package_id=self.contracts.get_package_id()
-        perp_id=self.contracts.get_perpetual_id()
-
 
         callArgs=[bank_id, account_address, str(amount)]
         txBytes=rpc_unsafe_moveCall("https://fullnode.testnet.sui.io:443",
@@ -407,17 +391,36 @@ class FireflyClient:
                             "withdraw_from_bank",
                             "margin_bank",
                             self.account.getUserAddress(),
-                            self.contracts.get_package_id(),
-                            self.contracts.get_perpetual_id(),
+                            self.contracts.get_package_id()
                             )
         signature=self.contract_signer.sign_tx(txBytes, self.account)
         res=rpc_sui_executeTransactionBlock("https://fullnode.testnet.sui.io:443",
                                         txBytes,
                                         signature)
-        
-        
 
-        return True
+        return res
+
+    async def withdraw_all_margin_from_bank(self):
+        bank_id=self.contracts.get_bank_id()
+        account_address=self.account.getUserAddress()
+        perp_id=self.contracts.get_perpetual_id()
+
+
+        callArgs=[bank_id, account_address]
+        txBytes=rpc_unsafe_moveCall("https://fullnode.testnet.sui.io:443",
+                            callArgs,
+                            "withdraw_all_margin_from_bank",
+                            "margin_bank",
+                            self.account.getUserAddress(),
+                            self.contracts.get_package_id()
+                            )
+        signature=self.contract_signer.sign_tx(txBytes, self.account)
+        res=rpc_sui_executeTransactionBlock("https://fullnode.testnet.sui.io:443",
+                                        txBytes,
+                                        signature)
+
+        return res
+
 
     async def adjust_leverage(self, symbol, leverage, parentAddress:str=""):
         """
@@ -528,6 +531,13 @@ class FireflyClient:
             return from_wei(self.w3.eth.get_balance(self.w3.toChecksumAddress(self.account.address)), "ether")
         except Exception as e:
             raise(Exception("Failed to get balance, Exception: {}".format(e)))
+    def get_usdc_coins(self):
+        callArgs=[]
+        callArgs.append(self.account.getUserAddress())
+        callArgs.append(self.contracts.get_currency_type())
+        result=rpc_get_usdc_coins("https://fullnode.testnet.sui.io:443",callArgs )
+        return result
+
 
     async def get_usdc_balance(self):
         """
@@ -545,6 +555,7 @@ class FireflyClient:
             Returns user's Margin Bank balance.
         """
         try:
+
             contract = self.contracts.get_contract(name="MarginBank")
             return from_wei(contract.functions.getAccountBankBalance(self.account.address).call(),"ether")
         except Exception as e:

@@ -17,6 +17,7 @@ async def main():
         TEST_ACCT_KEY, # private key of wallet
         )
     await client.init(True) 
+    await client.withdraw_margin_from_bank(1000)
 
 
 

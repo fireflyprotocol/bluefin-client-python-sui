@@ -346,7 +346,7 @@ class FireflyClient:
             )
 
     ## Contract calls
-    async def deposit_margin_to_bank(self, amount: int, coin_id: str)-> bool:
+    async def deposit_margin_to_bank(self, amount: int, coin_id: str, market=MARKET_SYMBOLS.ETH)-> bool:
         """
             Deposits given amount of USDC from user's account to margin bank
 
@@ -356,7 +356,7 @@ class FireflyClient:
             Returns:
                 Boolean: true if amount is successfully deposited, false otherwise
         """
-        package_id=self.contracts.get_package_id()
+        package_id=self.contracts.get_package_id(market=market)
         user_address=self.account.getUserAddress()
         callArgs=[]
         callArgs.append(self.contracts.get_bank_id())
@@ -377,7 +377,7 @@ class FireflyClient:
 
         return res
 
-    async def withdraw_margin_from_bank(self, amount):
+    async def withdraw_margin_from_bank(self, amount, market=MARKET_SYMBOLS.ETH):
         """
             Withdraws given amount of usdc from margin bank if possible
 
@@ -397,7 +397,7 @@ class FireflyClient:
                             "withdraw_from_bank",
                             "margin_bank",
                             self.account.getUserAddress(),
-                            self.contracts.get_package_id()
+                            self.contracts.get_package_id(market=market)
                             )
         signature=self.contract_signer.sign_tx(txBytes, self.account)
         res=rpc_sui_executeTransactionBlock(self.url,
@@ -406,7 +406,7 @@ class FireflyClient:
 
         return res
 
-    async def withdraw_all_margin_from_bank(self):
+    async def withdraw_all_margin_from_bank(self, market=MARKET_SYMBOLS.ETH):
         bank_id=self.contracts.get_bank_id()
         account_address=self.account.getUserAddress()
         perp_id=self.contracts.get_perpetual_id()
@@ -418,7 +418,7 @@ class FireflyClient:
                             "withdraw_all_margin_from_bank",
                             "margin_bank",
                             self.account.getUserAddress(),
-                            self.contracts.get_package_id()
+                            self.contracts.get_package_id(market=market)
                             )
         signature=self.contract_signer.sign_tx(txBytes, self.account)
         res=rpc_sui_executeTransactionBlock(self.url,
@@ -447,14 +447,22 @@ class FireflyClient:
         account_address = self.account.address if parentAddress=="" else parentAddress
         # implies user has an open position on-chain, perform on-chain leverage update
         if(user_position != {}):
-            perp_contract = self.contracts.get_contract(name="Perpetual", market=symbol.value) 
-            construct_txn = perp_contract.functions.adjustLeverage(
-                account_address, 
-                toDapiBase(leverage)).buildTransaction({
-                    'from': self.account.address,
-                    'nonce': self.w3.eth.getTransactionCount(self.account.address),
-                    })            
-            self._execute_tx(construct_txn)
+            callArgs = [];
+            callArgs.append(self.contracts.get_perpetual_id(symbol))
+            callArgs.append(self.contracts.get_bank_id())
+            callArgs.append(self.contracts.get_sub_account_id())
+            callArgs.append(account_address)
+            callArgs.append(str(toSuiBase(leverage)))
+            callArgs.append(self.contracts.get_price_oracle_object_id(symbol.value))
+            txBytes=rpc_unsafe_moveCall(self.url, 
+                                callArgs,
+                                "adjust_leverage",
+                                "exchange",
+                                self.account.getUserAddress(),
+                                self.contracts.get_package_id(market=symbol))
+            signature=self.contract_signer.sign_tx(txBytes, self.account)
+            result=rpc_sui_executeTransactionBlock(self.url, txBytes, signature)
+            return result
 
         else:
             await self.apis.post(
@@ -498,7 +506,7 @@ class FireflyClient:
             callArgs.append(self.account.getUserAddress())
             callArgs.append(str(amount))
             callArgs.append(self.contracts.get_price_oracle_object_id(symbol))
-            if operation==MARGIN_TYPE.ADD:
+            if operation==ADJUST_MARGIN.ADD:
                 txBytes=rpc_unsafe_moveCall(self.url,
                                     callArgs,
                                     "add_margin",
@@ -515,7 +523,7 @@ class FireflyClient:
                                     self.contracts.get_package_id())
             
             signature=self.contract_signer.sign_tx(txBytes, self.account)
-            rpc_sui_executeTransactionBlock("",txBytes, signature)
+            result=rpc_sui_executeTransactionBlock(self.url,txBytes, signature)
             
         return True
     
@@ -547,7 +555,7 @@ class FireflyClient:
         if result['result']['effects']['status']['status']=='success':
             return True
         else:
-            False
+            return False
 
     async def get_native_chain_token_balance(self)-> float:
         """

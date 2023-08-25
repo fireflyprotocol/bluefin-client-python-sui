@@ -26,7 +26,7 @@ class Contracts:
     def get_currency_type(self):
         return self.contract_addresses['auxiliaryContractsAddresses']['objects']['Currency']['dataType']
     
-    def get_bank_id(self, market: MARKET_SYMBOLS=MARKET_SYMBOLS.ETH):
+    def get_bank_id(self):
         return self.contract_addresses['auxiliaryContractsAddresses']['objects']['Bank']['id']
     def get_contract(self,name,market=""):
         """

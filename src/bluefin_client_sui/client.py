@@ -128,24 +128,6 @@ class FireflyClient:
             )
         return True 
 
-    def add_contract(self,name,address,market=None):
-        """
-            Adds contracts to the instance's contracts dictionary. 
-            The contract name should match the contract's abi name in ./abi directory or a new abi should be added with the desired name.
-            Inputs:
-                name(str): The contract name.
-                address(str): The contract address.
-                market(str): The market (ETH/BTC) this contract belongs to (required for market specific contracts).
-        """
-        abi = self.contracts.get_contract_abi(name)
-        if market:
-            contract=self.w3.eth.contract(address=Web3.toChecksumAddress(address), abi=abi)
-            self.contracts.set_contracts(market=market,name=name,contract=contract)
-        else:
-            contract=self.w3.eth.contract(address=Web3.toChecksumAddress(address), abi=abi)
-            self.contracts.set_contracts(name=name,contract=contract)
-        return 
-
     def create_order_to_sign(self, params:OrderSignatureRequest):
         """
             Creates order signature request for an order.
@@ -998,30 +980,6 @@ class FireflyClient:
                 raise(Exception("Signer does not exist. Make sure to add market"))
         else:
             return self.order_signers
-
-    def _execute_tx(self, transaction):
-        """
-            An internal function to create signed tx and wait for its receipt
-        Args:
-            transaction: A constructed txn using self.account address
-
-        Returns:
-            tx_receipt: a receipt of txn mined on-chain
-        """
-        tx_create = self.w3.eth.account.signTransaction(transaction, self.account.key)
-        tx_hash = self.w3.eth.sendRawTransaction(tx_create.rawTransaction)
-        return self.w3.eth.waitForTransactionReceipt(tx_hash)
-
-    def _connect_w3(self,url):
-        """
-            Creates a connection to Web3 RPC given the RPC url.
-        """
-        try:
-            return Web3(Web3.HTTPProvider(url))
-        except:
-            raise(Exception("Failed to connect to Host: {}".format(url)))
-           
-
 
     async def close_connections(self):
          # close aio http connection

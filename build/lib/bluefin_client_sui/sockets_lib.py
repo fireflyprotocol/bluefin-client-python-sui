@@ -156,7 +156,7 @@ class Sockets:
         Allows user to subscribe to their account updates.
         Inputs:
             - parent_account(str): address of parent account. Only whitelisted
-            sub-account can listen to its parent account position updates
+              sub-account can listen to its parent account position updates
             - token(str): auth token generated when onboarding on Bluefin
         """
         try:

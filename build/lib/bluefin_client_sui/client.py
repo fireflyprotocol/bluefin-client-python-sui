@@ -308,8 +308,8 @@ class BluefinClient:
                 ),
                 "postOnly": default_value(params, "postOnly", False),
                 "cancelOnRevert": default_value(params, "cancelOnRevert", False),
-                "clientId": "bluefin-python-client: {}".format(
-                    default_value(params, "clientId", "bluefin-python-client")
+                "clientId": "Bluefin-client: {}".format(
+                    default_value(params, "clientId", "Bluefin-client")
                 ),
             },
             auth_required=True,

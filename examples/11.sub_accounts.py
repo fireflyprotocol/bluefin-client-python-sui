@@ -22,9 +22,6 @@ async def main():
   status = await clientParent.update_sub_account(clientChild.get_public_address(), True)
   print(f"Sub account created: {status}")
 
-
-  clientChild.add_market(MARKET_SYMBOLS.ETH)
-
   parent_leverage =  await clientParent.get_user_leverage(MARKET_SYMBOLS.ETH)
   await clientParent.adjust_leverage(MARKET_SYMBOLS.ETH,1)
   parent_leverage = await clientParent.get_user_leverage(MARKET_SYMBOLS.ETH)

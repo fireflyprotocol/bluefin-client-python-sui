@@ -35,11 +35,11 @@ When initializing the client, users must accept [terms and conditions](https://f
 
 ```json
 {
-  "apiGateway": "https://dapi.api.sui-staging.bluefin.io",
-  "socketURL": "wss://dapi.api.sui-staging.bluefin.io",
-  "dmsURL": "https://dapi.api.sui-staging.bluefin.io",
-  "webSocketURL": "wss://notifications.api.sui-staging.bluefin.io",
-  "onboardingUrl": "https://testnet.bluefin.io"
+  "apiGateway": "https://dapi.api.sui-prod.bluefin.io",
+  "socketURL": "wss://dapi.api.sui-prod.bluefin.io",
+  "dmsURL": "https://dapi.api.sui-prod.bluefin.io",
+  "webSocketURL": "wss://notifications.api.sui-prod.bluefin.io",
+  "onboardingUrl": "https://trade.bluefin.io"
 }
 ```
 
@@ -49,7 +49,7 @@ Users can import predefined networks from [constants](https://github.com/firefly
 from bluefin_client_sui import Networks
 ```
 
-For testing purposes use `Networks[SUI_STAGING]` and for production please use `Networks[SUI_PROD]`. Currently only SUI_STAGING is available.
+For testing purposes use `Networks[SUI_STAGING]` and for production please use `Networks[SUI_PROD]`.
 
 ## Initialization example​
 
@@ -136,9 +136,6 @@ async def main():
         )
 
     await client.init(True)
-
-    # add market that you wish to trade on ETH/BTC are supported currently
-    client.add_market(MARKET_SYMBOLS.ETH)
 
     user_leverage = await client.get_user_leverage(MARKET_SYMBOLS.ETH)
 

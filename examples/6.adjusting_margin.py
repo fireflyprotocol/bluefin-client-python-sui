@@ -70,7 +70,6 @@ async def main():
 
     client = FireflyClient(True, Networks[TEST_NETWORK], TEST_ACCT_KEY)
     await client.init(True)
-    client.add_market(MARKET_SYMBOLS.ETH)
     print (await client.get_usdc_balance())
     
     #usdc_coins=client.get_usdc_coins()

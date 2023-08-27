@@ -78,9 +78,6 @@ async def main():
 
     await client.init(True) 
 
-    # add market that you wish to trade on ETH/BTC are supported currently
-    client.add_market(MARKET_SYMBOLS.ETH)
-
     # await place_limit_order(client)
     await (client)
     await place_limit_order(client)

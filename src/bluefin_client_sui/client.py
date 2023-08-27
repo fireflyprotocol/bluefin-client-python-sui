@@ -9,12 +9,13 @@ from .constants import TIME, SERVICE_URLS
 from .sockets_lib import Sockets
 from .websocket_client import WebsocketClient
 from .signer import Signer
-from .utilities import toSuiBase, default_value
+from .utilities import default_value
 from .rpc import *
 from .account import *
 from .interfaces import *
 from .enumerations import *
 
+_SUI_BASE_NUM=1000000000
 class FireflyClient:
     def __init__(self, are_terms_accepted, network, private_key=""):
         self.are_terms_accepted = are_terms_accepted
@@ -143,9 +144,9 @@ class FireflyClient:
                 OrderSignatureResponse: order raw info and generated signature
         """
         sui_params = deepcopy(req)
-        sui_params["price"] = toSuiBase(req["price"])
-        sui_params["quantity"] = toSuiBase(req["quantity"])
-        sui_params["leverage"] = toSuiBase(req["leverage"])
+        sui_params["price"] = self._to_sui_base(req["price"])
+        sui_params["quantity"] = self._to_sui_base(req["quantity"])
+        sui_params["leverage"] = self._to_sui_base(req["leverage"])
 
         order = self.create_order_to_sign(sui_params)
         symbol = sui_params["symbol"].value
@@ -156,7 +157,7 @@ class FireflyClient:
             price=sui_params["price"],
             quantity=sui_params["quantity"],
             side=sui_params["side"],
-            leverage=default_value(sui_params, "leverage", toSuiBase(1)),
+            leverage=default_value(sui_params, "leverage", self._to_sui_base(1)),
             reduceOnly=default_value(sui_params, "reduceOnly", False),
             salt=order["salt"],
             expiration=order["expiration"],
@@ -303,7 +304,7 @@ class FireflyClient:
         callArgs=[]
         callArgs.append(self.contracts.get_bank_id())
         callArgs.append(self.account.getUserAddress())
-        callArgs.append(str(toSuiBase(amount)))
+        callArgs.append(str(self._to_sui_base(amount)))
         callArgs.append(coin_id)
         txBytes=rpc_unsafe_moveCall(self.url,
                                     callArgs,
@@ -392,9 +393,9 @@ class FireflyClient:
             callArgs.append(self.contracts.get_bank_id())
             callArgs.append(self.contracts.get_sub_account_id())
             callArgs.append(account_address)
-            callArgs.append(str(toSuiBase(leverage)))
+            callArgs.append(str(self._to_sui_base(leverage)))
             callArgs.append(self.contracts.get_price_oracle_object_id(symbol.value))
-            txBytes=rpc_unsafe_moveCall(self.url, 
+            txBytes=rpc_unsafe_moveCall(self.url,
                 callArgs,
                 "adjust_leverage",
                 "exchange",
@@ -507,7 +508,7 @@ class FireflyClient:
             callArgs.append("0x2::sui::SUI")
 
             result=rpc_call_sui_function(self.url, callArgs, method="suix_getBalance")["totalBalance"]
-            return fromSuiBase(result)
+            return self._from_sui_base(result)
         except Exception as e:
             raise(Exception(f"Failed to get balance, error: {e}"))
         
@@ -531,7 +532,7 @@ class FireflyClient:
             callArgs.append(self.account.getUserAddress())
             callArgs.append(self.contracts.get_currency_type())
             result=rpc_call_sui_function(self.url, callArgs, method="suix_getBalance")["totalBalance"]
-            return fromSuiBase(result)
+            return self._from_sui_base(result)
         
         except Exception as e:
             raise(Exception("Failed to get balance, Exception: {}".format(e)))
@@ -539,18 +540,17 @@ class FireflyClient:
     async def get_margin_bank_balance(self)-> float:
         """
             Returns user's Margin Bank balance.
-        """ 
+        """
         try:
-
-            callArgs=[]
-            callArgs.append(self.contracts.get_bank_table_id())
-            callArgs.append({
+            call_args=[]
+            call_args.append(self.contracts.get_bank_table_id())
+            call_args.append({
                 "type": "address",
                 "value": self.account.getUserAddress()
             })
-            result=rpc_call_sui_function(self.url, callArgs, method="suix_getDynamicFieldObject")
+            result=rpc_call_sui_function(self.url, call_args, method="suix_getDynamicFieldObject")
         
-            balance=fromSuiBase(result["data"]["content"]["fields"]["value"]["fields"]["balance"])
+            balance=self._from_sui_base(result["data"]["content"]["fields"]["value"]["fields"]["balance"])
             return balance
         except Exception as e:
             raise(Exception("Failed to get balance, Exception: {}".format(e)))
@@ -776,7 +776,7 @@ class FireflyClient:
             {},
             True
         )
-    
+
     async def get_orders(self,params:GetOrderRequest):
         """
             Returns a list of orders.
@@ -918,3 +918,12 @@ class FireflyClient:
         # close aio http connection
         await self.apis.close_session()
         await self.dms_api.close_session()
+
+
+    def _from_sui_base(self, number: Union[str,int]) -> float:
+        number=float(number)
+        return number/float(_SUI_BASE_NUM)
+
+
+    def _to_sui_base(self, number: Union[int,float]) -> int:
+        return int(number*_SUI_BASE_NUM)

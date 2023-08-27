@@ -125,7 +125,6 @@ if __name__ == "__main__":
 ```python
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest
-from bluefin_client_sui.utilities import toSuiBase
 import asyncio
 
 async def main():
@@ -146,11 +145,11 @@ async def main():
     # creates a LIMIT order to be signed
     signature_request = OrderSignatureRequest(
         symbol=MARKET_SYMBOLS.ETH,  # market symbol
-        price=toSuiBase(1900),  # price at which you want to place order
-        quantity=toSuiBase(0.01), # quantity
+        price=1900,  # price at which you want to place order
+        quantity=0.01, # quantity
         side=ORDER_SIDE.SELL,
         orderType=ORDER_TYPE.LIMIT,
-        leverage=toSuiBase(user_leverage)
+        leverage=user_leverage
     )
 
     # create signed order

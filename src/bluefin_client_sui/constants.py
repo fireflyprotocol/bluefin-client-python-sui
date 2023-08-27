@@ -1,6 +1,7 @@
 Networks = {
   "SUI_STAGING":{
       "url":"https://fullnode.testnet.sui.io:443",
+      "chainId":1234,
       "apiGateway":"https://dapi.api.sui-staging.bluefin.io",
       "socketURL":"wss://dapi.api.sui-staging.bluefin.io",
       "dmsURL":"https://dapi.api.sui-staging.bluefin.io",
@@ -10,6 +11,7 @@ Networks = {
   },
   "SUI_PROD":{
       "url":"https://fullnode.testnet.sui.io:443",
+      "chainId":1234,
       "apiGateway":"https://dapi.api.sui-prod.bluefin.io",
       "socketURL":"wss://dapi.api.sui-prod.bluefin.io",
       "dmsURL":"https://dapi.api.sui-prod.bluefin.io",
@@ -17,6 +19,23 @@ Networks = {
       "onboardingUrl": "https://trade.bluefin.io",
   }
 }
+
+EIP712_DOMAIN_NAME = "IsolatedTrader"
+
+
+EIP712_DOMAIN_STRING = "EIP712Domain(string name,string version,uint128 chainId,address verifyingContract)"
+
+
+EIP712_ORDER_STRUCT_STRING = \
+    "Order(" +  \
+    "bytes8 flags," + \
+    "uint128 quantity," + \
+    "uint128 price," + \
+    "uint128 triggerPrice," + \
+    "uint128 leverage," + \
+    "address maker," + \
+    "uint128 expiration" + \
+    ")"
 
 ORDER_FLAGS = {
     "IS_BUY":1,
@@ -67,6 +86,23 @@ SERVICE_URLS = {
     "ORDERS_HASH": "/orders/hash",
   },
 }
+
+EIP712_CANCEL_ORDER_STRUCT_STRING ="CancelLimitOrder(string action,bytes32[] orderHashes)"
+
+EIP712_ONBOARDING_ACTION_STRUCT_STRING = \
+    'firefly(' + \
+    'string action,' + \
+    'string onlySignOn' + \
+    ')'
+
+EIP712_DOMAIN_STRING_NO_CONTRACT = \
+    "EIP712Domain(" + \
+    "string name," + \
+    "string version," + \
+    "uint128 chainId" + \
+    ")"
+
+
 
 SUI_BASE_NUM=1000000000
 DAPI_BASE_NUM=1000000000000000000

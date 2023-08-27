@@ -1,7 +1,6 @@
 Networks = {
   "SUI_STAGING":{
       "url":"https://fullnode.testnet.sui.io:443",
-      "chainId":1234,
       "apiGateway":"https://dapi.api.sui-staging.bluefin.io",
       "socketURL":"wss://dapi.api.sui-staging.bluefin.io",
       "dmsURL":"https://dapi.api.sui-staging.bluefin.io",
@@ -11,7 +10,6 @@ Networks = {
   },
   "SUI_PROD":{
       "url":"https://fullnode.testnet.sui.io:443",
-      "chainId":1234,
       "apiGateway":"https://dapi.api.sui-prod.bluefin.io",
       "socketURL":"wss://dapi.api.sui-prod.bluefin.io",
       "dmsURL":"https://dapi.api.sui-prod.bluefin.io",

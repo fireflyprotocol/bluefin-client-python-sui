@@ -9,45 +9,16 @@ Networks = {
       "onboardingUrl": "https://testnet.bluefin.io",
 
   },
-
-  "DEV": {
-    "url": "https://l2-dev.firefly.exchange/",
-    "chainId": 78602,
-    "apiGateway": "https://dapi-dev.firefly.exchange",
-    "socketURL": "wss://dapi-dev.firefly.exchange",
-    "onboardingUrl": "https://dev.firefly.exchange",
-  },
-
-  "TESTNET_ARBITRUM": {
-    "url": "https://goerli-rollup.arbitrum.io/rpc",
-    "chainId": 421613,
-    "apiGateway": "https://dapi.api.arbitrum-staging.firefly.exchange",
-    "dmsURL": "https://api.arbitrum-staging.firefly.exchange/dead-man-switch",
-    "socketURL": "wss://dapi.api.arbitrum-staging.firefly.exchange",
-    "webSocketURL": "wss://notifications.api.arbitrum-staging.firefly.exchange",
-    "onboardingUrl": "https://testnet.firefly.exchange",
-    "UUID": "uuid-default"
-  },
-
-  "MAINNET_BOBA": {
-    "url": "https://bobabeam.boba.network/",
-    "chainId": 1294,
-    "apiGateway": "https://dapi.firefly.exchange",
-    "socketURL": "wss://dapi.firefly.exchange",
-    "onboardingUrl": "https://trade.firefly.exchange",
-  },
-  "MAINNET_ARBITRUM": {
-    "url": "https://arb1.arbitrum.io/rpc/",
-    "chainId": 42161,
-    "apiGateway": "https://dapi.api.arbitrum-prod.firefly.exchange",
-    "dmsURL": "https://api.arbitrum-prod.firefly.exchange/dead-man-switch",
-    "socketURL": "wss://dapi.api.arbitrum-prod.firefly.exchange",
-    "webSocketURL": "wss://notifications.api.arbitrum-prod.firefly.exchange",
-    "onboardingUrl": "https://trade-arb.firefly.exchange",
-    "UUID": "uuid-default"
-  },
+  "SUI_PROD":{
+      "url":"https://fullnode.testnet.sui.io:443",
+      "chainId":1234,
+      "apiGateway":"https://dapi.api.sui-prod.bluefin.io",
+      "socketURL":"wss://dapi.api.sui-prod.bluefin.io",
+      "dmsURL":"https://dapi.api.sui-prod.bluefin.io",
+      "webSocketURL":"wss://notifications.api.sui-prod.bluefin.io",
+      "onboardingUrl": "https://trade.bluefin.io",
+  }
 }
-
 
 EIP712_DOMAIN_NAME = "IsolatedTrader"
 

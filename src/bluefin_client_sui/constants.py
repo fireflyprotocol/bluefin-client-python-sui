@@ -20,23 +20,6 @@ Networks = {
   }
 }
 
-EIP712_DOMAIN_NAME = "IsolatedTrader"
-
-
-EIP712_DOMAIN_STRING = "EIP712Domain(string name,string version,uint128 chainId,address verifyingContract)"
-
-
-EIP712_ORDER_STRUCT_STRING = \
-    "Order(" +  \
-    "bytes8 flags," + \
-    "uint128 quantity," + \
-    "uint128 price," + \
-    "uint128 triggerPrice," + \
-    "uint128 leverage," + \
-    "address maker," + \
-    "uint128 expiration" + \
-    ")"
-
 ORDER_FLAGS = {
     "IS_BUY":1,
     "IS_DECREASE_ONLY": 2
@@ -86,22 +69,6 @@ SERVICE_URLS = {
     "ORDERS_HASH": "/orders/hash",
   },
 }
-
-EIP712_CANCEL_ORDER_STRUCT_STRING ="CancelLimitOrder(string action,bytes32[] orderHashes)"
-
-EIP712_ONBOARDING_ACTION_STRUCT_STRING = \
-    'firefly(' + \
-    'string action,' + \
-    'string onlySignOn' + \
-    ')'
-
-EIP712_DOMAIN_STRING_NO_CONTRACT = \
-    "EIP712Domain(" + \
-    "string name," + \
-    "string version," + \
-    "uint128 chainId" + \
-    ")"
-
 
 
 SUI_BASE_NUM=1000000000

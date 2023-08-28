@@ -1,7 +1,9 @@
 import json
 
 import sys,os
-sys.path.append(os.getcwd()+"/src/")
+#Commented as of now, to be only uncommented when testing library
+#sys.path.append(os.getcwd()+"/src/")
+
 from config import TEST_ACCT_KEY, TEST_SUB_ACCT_KEY, TEST_NETWORK
 from bluefin_client_sui import FireflyClient, MARKET_SYMBOLS, ORDER_SIDE, ORDER_TYPE, Networks, OrderSignatureRequest
 import asyncio

@@ -3,7 +3,9 @@ When ever the state of orderbook changes, an event is emitted by exchange.
 In this code example we open a socket connection and listen to orderbook update event
 '''
 import sys,os
-sys.path.append(os.getcwd()+"/src/")
+#Commented as of now, to be only uncommented when testing library
+#sys.path.append(os.getcwd()+"/src/")
+
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest

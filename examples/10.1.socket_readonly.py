@@ -1,5 +1,6 @@
 import sys,os
-sys.path.append(os.getcwd()+"/src/")
+#Commented as of now, to be only uncommented when testing library
+#sys.path.append(os.getcwd()+"/src/")
 
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK

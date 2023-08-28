@@ -4,7 +4,9 @@ It places a limit order and as soon as its OPENED on order book, we receive
 an event, log its data and terminate connection
 '''
 import sys,os
-sys.path.append(os.getcwd()+"/src/")
+#Commented as of now, to be only uncommented when testing library
+#sys.path.append(os.getcwd()+"/src/")
+
 import time
 from config import TEST_ACCT_KEY, TEST_NETWORK
 from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, SOCKET_EVENTS, ORDER_SIDE, ORDER_TYPE, OrderSignatureRequest

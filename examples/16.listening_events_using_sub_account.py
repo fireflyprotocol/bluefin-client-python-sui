@@ -4,6 +4,10 @@
   has no position of its own. So when placing orders or listening to position updates
   the sub account must specify the parent address whose position its listening.
 '''
+import sys,os
+#Commented as of now, to be only uncommented when testing library
+#sys.path.append(os.getcwd()+"/src/")
+
 import time, sys
 from config import TEST_ACCT_KEY, TEST_NETWORK, TEST_SUB_ACCT_KEY
 from bluefin_client_sui import FireflyClient, Networks, MARKET_SYMBOLS, OrderSignatureRequest, ORDER_SIDE, ORDER_TYPE, SOCKET_EVENTS

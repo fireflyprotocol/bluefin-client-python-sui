@@ -41,7 +41,6 @@ class FireflyClient:
                 user_onboarding (bool, optional): If set to true onboards the user address to exchange and gets authToken. Defaults to True.
                 api_token(string, optional): API token to initialize client in read-only mode 
         """
-        #await self.set_contracts_for_all_markets()
         self.contracts.contract_addresses = await self.get_contract_addresses()
         self.contracts.set_contract_addresses(self.contracts.contract_addresses)
 
@@ -56,12 +55,7 @@ class FireflyClient:
             self.dmsApi.auth_token = self.apis.auth_token
             self.socket.set_token(self.apis.auth_token)
             self.webSocketClient.set_token(self.apis.auth_token)
-
-    async def set_contracts_for_all_markets(self):
-        for symbol in MARKET_SYMBOLS:
-            self.contracts.contract_addresses = await self.get_contract_addresses(symbol)
-            self.contracts.set_contract_addresses(self.contracts.contract_addresses, market=symbol) 
-
+    
 
     async def onboard_user(self, token:str=None):
         """
@@ -121,36 +115,11 @@ class FireflyClient:
         if (symbol_str in self.order_signers):
             return False 
           
-        # if orders contract address is not provided get 
-        # from addresses retrieved from dapi
-        #if trader_contract == None:
-        #    try:
-        #        trader_contract = self.contracts.contract_addresses[symbol_str]["IsolatedTrader"]
-        #    except:
-        #        raise SystemError("Can't find orders contract address for market: {}".format(symbol_str))
-
         self.order_signers[symbol_str] = OrderSigner(
             self.network["chainId"],
             )
         return True 
 
-    def add_contract(self,name,address,market=None):
-        """
-            Adds contracts to the instance's contracts dictionary. 
-            The contract name should match the contract's abi name in ./abi directory or a new abi should be added with the desired name.
-            Inputs:
-                name(str): The contract name.
-                address(str): The contract address.
-                market(str): The market (ETH/BTC) this contract belongs to (required for market specific contracts).
-        """
-        abi = self.contracts.get_contract_abi(name)
-        if market:
-            contract=self.w3.eth.contract(address=Web3.toChecksumAddress(address), abi=abi)
-            self.contracts.set_contracts(market=market,name=name,contract=contract)
-        else:
-            contract=self.w3.eth.contract(address=Web3.toChecksumAddress(address), abi=abi)
-            self.contracts.set_contracts(name=name,contract=contract)
-        return 
 
     def create_order_to_sign(self, params:OrderSignatureRequest):
         """
@@ -380,10 +349,13 @@ class FireflyClient:
                                         txBytes,
                                         signature)
         
-        return res['result']['effects']['status']['status']
+        if res['result']['effects']['status']['status']=='success':
+            return True
+        else:
+            return False
 
 
-    async def withdraw_margin_from_bank(self, amount, market=MARKET_SYMBOLS.ETH):
+    async def withdraw_margin_from_bank(self, amount: Union[int,float], market=MARKET_SYMBOLS.ETH)-> bool:
         """
             Withdraws given amount of usdc from margin bank if possible
 
@@ -410,13 +382,23 @@ class FireflyClient:
                                         txBytes,
                                         signature)
 
-        return res['result']['effects']['status']['status']
+        if res['result']['effects']['status']['status']=='success':
+            return True
+        else:
+            return False
 
-    async def withdraw_all_margin_from_bank(self, market=MARKET_SYMBOLS.ETH):
+    async def withdraw_all_margin_from_bank(self) -> bool:
+        """
+            Withdraws everything of usdc from margin bank 
+
+            Inputs:
+                No input Required
+            Returns:
+                Boolean: true if amount is successfully withdrawn, false otherwise
+        """
         bank_id=self.contracts.get_bank_id()
         account_address=self.account.getUserAddress()
-        perp_id=self.contracts.get_perpetual_id()
-
+        
 
         callArgs=[bank_id, account_address]
         txBytes=rpc_unsafe_moveCall(self.url,
@@ -431,10 +413,13 @@ class FireflyClient:
                                         txBytes,
                                         signature)
 
-        return res['result']['effects']['status']['status']
+        if res['result']['effects']['status']['status']=="success":
+            return True
+        else:
+            return False
 
 
-    async def adjust_leverage(self, symbol, leverage, parentAddress:str=""):
+    async def adjust_leverage(self, symbol, leverage, parentAddress:str="")-> bool:
         """
             Adjusts user leverage to the provided one for their current position on-chain and off-chain.
             If a user has no position for the provided symbol, leverage only recorded off-chain
@@ -453,7 +438,7 @@ class FireflyClient:
         account_address = self.account.address if parentAddress=="" else parentAddress
         # implies user has an open position on-chain, perform on-chain leverage update
         if(user_position != {}):
-            callArgs = [];
+            callArgs = []
             callArgs.append(self.contracts.get_perpetual_id(symbol))
             callArgs.append(self.contracts.get_bank_id())
             callArgs.append(self.contracts.get_sub_account_id())
@@ -468,7 +453,10 @@ class FireflyClient:
                                 self.contracts.get_package_id())
             signature=self.contract_signer.sign_tx(txBytes, self.account)
             result=rpc_sui_executeTransactionBlock(self.url, txBytes, signature)
-            return result
+            if result['result']['effects']['status']['status']=='success':
+                return True
+            else:
+                return False
 
         else:
             await self.apis.post(

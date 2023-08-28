@@ -16,7 +16,7 @@ async def main():
 
     )
 
-    await client.init(True, symbol= MARKET_SYMBOLS.BTC) 
+    await client.init(True) 
 
     print('Leverage on BTC market:', await client.get_user_leverage(MARKET_SYMBOLS.BTC))
     # we have a position on BTC so this will perform on-chain leverage update
@@ -25,14 +25,6 @@ async def main():
 
     print('Leverage on BTC market:', await client.get_user_leverage(MARKET_SYMBOLS.BTC))
 
-        # initialize client
-    client = FireflyClient(
-        True, # agree to terms and conditions
-        Networks[TEST_NETWORK], # network to connect with
-        TEST_ACCT_KEY, # private key of wallet
-    )
-
-    await client.init(True, symbol=MARKET_SYMBOLS.ETH) 
 
     print('Leverage on ETH market:', await client.get_user_leverage(MARKET_SYMBOLS.ETH))
     # since we don't have a position on-chain, it will perform off-chain leverage adjustment

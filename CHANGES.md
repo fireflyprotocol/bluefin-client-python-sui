@@ -73,3 +73,5 @@
         hash=hashlib.blake2b(intent,digest_size=32)
         #then we finally sign the hash
    ```
+## Margin Bank:
+1. When you insert money to margin bank we give it in BASE 6 but when we see balance it is in base9.  internally the functions are implemented that way.

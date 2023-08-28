@@ -14,14 +14,17 @@ async def main():
 
     client = FireflyClient(True, Networks[TEST_NETWORK], TEST_ACCT_KEY)
     await client.init(True)
-
+  
     # must add market before cancelling its orders
     client.add_market(MARKET_SYMBOLS.ETH)
+    client.add_market(MARKET_SYMBOLS.BTC)
+
     #client.create_order_to_sign()
     await client.adjust_leverage(MARKET_SYMBOLS.ETH, 1) 
+    await client.adjust_leverage(MARKET_SYMBOLS.BTC,1)
 
     
-        # creates a LIMIT order to be signed
+    # creates a LIMIT order to be signed
     order = OrderSignatureRequest(
         symbol=MARKET_SYMBOLS.ETH,  # market symbol
         price=toSuiBase(1636.8),  # price at which you want to place order

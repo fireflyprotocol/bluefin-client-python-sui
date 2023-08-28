@@ -5,9 +5,8 @@ class Contracts:
         self.contracts = {}
         self.contract_addresses = {}
         
-    def set_contract_addresses(self,contract_address,market=None,name=None):
+    def set_contract_addresses(self,contract_address):
         self.contract_addresses["auxiliaryContractsAddresses"]=contract_address['auxiliaryContractsAddresses']
-        self.contract_addresses[market]=contract_address[market.value]
     
     def get_sub_account_id(self):
         return self.contract_addresses['auxiliaryContractsAddresses']['objects']['SubAccounts']['id']
@@ -15,14 +14,14 @@ class Contracts:
     def get_bank_table_id(self):
         return self.contract_addresses['auxiliaryContractsAddresses']['objects']['BankTable']['id']
 
-    def get_price_oracle_object_id(self, market):
-        return self.contract_addresses[market]['PriceOracle']['id']
+    def get_price_oracle_object_id(self, market: MARKET_SYMBOLS):
+        return self.contract_addresses[market.value]['PriceOracle']['id']
 
-    def get_perpetual_id(self, market: MARKET_SYMBOLS=MARKET_SYMBOLS.ETH):
-        return self.contract_addresses[market]['Perpetual']['id']
-    def get_package_id(self, market: MARKET_SYMBOLS=MARKET_SYMBOLS.ETH):
-        return self.contract_addresses[market]['package']['id']
-    
+    def get_perpetual_id(self, market: MARKET_SYMBOLS):
+        return self.contract_addresses[market.value]['Perpetual']['id']
+    def get_package_id(self):
+        return self.contract_addresses['auxiliaryContractsAddresses']['objects']['package']['id']
+        
     def get_currency_type(self):
         return self.contract_addresses['auxiliaryContractsAddresses']['objects']['Currency']['dataType']
     

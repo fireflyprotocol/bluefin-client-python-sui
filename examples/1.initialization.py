@@ -6,6 +6,8 @@ sys.path.append(os.getcwd()+"/src/")
 
 from config import TEST_ACCT_KEY, TEST_NETWORK
 
+import sys,os
+sys.path.append(os.getcwd()+"/src/")
 from bluefin_client_sui import FireflyClient, Networks
 from pprint import pprint
 import asyncio

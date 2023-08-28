@@ -40,10 +40,10 @@ async def place_market_order(client: FireflyClient):
     
 
     # default leverage of account is set to 3 on firefly
-    user_leverage = await client.get_user_leverage(MARKET_SYMBOLS.ETH)
+    await client.adjust_leverage(MARKET_SYMBOLS.BTC,1)
 
     signature_request = OrderSignatureRequest(
-        symbol=MARKET_SYMBOLS.ETH,
+        symbol=MARKET_SYMBOLS.BTC,
         price = toSuiBase(0),
         quantity = toSuiBase(1),
         leverage = toSuiBase(1),
@@ -51,7 +51,6 @@ async def place_market_order(client: FireflyClient):
         reduceOnly = False,
         postOnly = False,
         orderbookOnly = True,
-        maker = "0xa3c3504d90c428274beaa89f1238a769ea1d1c3516c31c0f4157f33787367af0",
         expiration = 1700530261000,
         salt = 1668690862116,
         orderType = ORDER_TYPE.MARKET,
@@ -82,10 +81,11 @@ async def main():
     await client.init(True) 
 
     # add market that you wish to trade on ETH/BTC are supported currently
+    client.add_market(MARKET_SYMBOLS.BTC)
     client.add_market(MARKET_SYMBOLS.ETH)
 
-    # await place_limit_order(client)
-    await (client)
+    await place_market_order(client)
+    #await (client)
     await place_limit_order(client)
     
     await client.close_connections()
